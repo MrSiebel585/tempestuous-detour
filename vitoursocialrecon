@@ -1,0 +1,24 @@
+#!/bin/bash
+# Phase 1 OSINT Recon on Dallas Reed Corp (vitourp1.com)
+
+TARGET_DOMAIN="vitourp1.com"
+TARGET_NAME="Dallas Reed Corp"
+OUTPUT_DIR=~/vitour/intel/dallasreed
+
+mkdir -p $OUTPUT_DIR && cd $OUTPUT_DIR
+
+echo "[*] Passive DNS/Whois Recon..."
+whois $TARGET_DOMAIN > whois.txt
+dig any $TARGET_DOMAIN +short > dns_records.txt
+
+echo "[*] Enumerating subdomains..."
+amass enum -d $TARGET_DOMAIN -o subdomains.txt
+
+echo "[*] Scanning leaked credentials and aliases..."
+holehe "$TARGET_DOMAIN" | tee email_leaks.txt
+python3 /opt/osint/breachhunter.py "$TARGET_DOMAIN" >> breach_results.txt
+
+echo "[*] Checking for GitHub, LinkedIn, Twitter, etc..."
+python3 /opt/osint/userpivot.py --domain "$TARGET_DOMAIN" --output accounts.json
+
+echo "[+] OSINT Recon complete for $TARGET_NAME → $OUTPUT_DIR"

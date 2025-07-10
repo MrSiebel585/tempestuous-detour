@@ -1,0 +1,20 @@
+#!/bin/bash
+# Deepfake Creation & Dissemination Script
+
+NAME="$1"
+VOICE_SAMPLE="$2"
+IMAGE_SAMPLE="$3"
+
+if [[ -z "$NAME" || -z "$VOICE_SAMPLE" || -z "$IMAGE_SAMPLE" ]]; then
+  echo "Usage: $0 <target_name> <voice_sample.wav> <image_sample.jpg>"
+  exit 1
+fi
+
+echo "[*] Generating deepfake video..."
+python3 /opt/ai/deepfake_maker.py --image $IMAGE_SAMPLE --voice $VOICE_SAMPLE --output "$NAME_blackmail.mp4"
+
+echo "[*] Preparing disinfo package for dissemination..."
+cp "$NAME_blackmail.mp4" ~/vitour/payloads/
+python3 /opt/ai/ai_slander_postgen.py --target "$NAME" --video "$NAME_blackmail.mp4"
+
+echo "[+] Disinformation asset created: ~/vitour/payloads/$NAME_blackmail.mp4"

@@ -1,0 +1,14 @@
+#!/bin/bash
+# AI-Generated Reputation Sabotage on Social Media
+
+TARGET_ALIAS="$1"
+PLATFORM_LIST=("linkedin" "weibo" "twitter" "wechat")
+
+echo "[*] Generating AI complaints and reviews..."
+mkdir -p ~/vitour/smear/$TARGET_ALIAS
+
+for PLATFORM in "${PLATFORM_LIST[@]}"; do
+  python3 /opt/ai/smearbot.py --platform "$PLATFORM" --target "$TARGET_ALIAS" --output "~/vitour/smear/$TARGET_ALIAS/$PLATFORM.json"
+done
+
+echo "[+] AI smear assets created. Begin strategic dissemination via burner accounts."

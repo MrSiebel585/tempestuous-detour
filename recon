@@ -1,0 +1,29 @@
+#!/bin/bash
+# Phase 1 OSINT Recon & Doxing Script for Project Vitour
+
+TARGET="$1"
+
+if [[ -z "$TARGET" ]]; then
+  echo "Usage: $0 <target_email_or_alias>"
+  exit 1
+fi
+
+mkdir -p ~/vitour/intel/$TARGET
+cd ~/vitour/intel/$TARGET
+
+echo "[*] Running holehe for credential leaks..."
+holehe $TARGET | tee holehe_leaks.txt
+
+echo "[*] Checking breach databases (dehashed, leaksDB)..."
+python3 /opt/osint/breachhunter.py "$TARGET" >> breach_results.txt
+
+echo "[*] Running username OSINT pivot..."
+python3 /opt/osint/userpivot.py --username "$TARGET" --output social_links.json
+
+echo "[*] Searching leaked documents and crypto wallets..."
+python3 /opt/osint/cryptotrace.py "$TARGET" > wallets.txt
+
+echo "[*] Enumerating past and current domains..."
+amass enum -d $(echo "$TARGET" | awk -F@ '{print $2}') -o domains.txt
+
+echo "[+] Phase 1 Recon Complete: ~/vitour/intel/$TARGET"
